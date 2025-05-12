@@ -1,0 +1,39 @@
+stages:
+  - lint
+  - test
+  - deploy
+
+variables:
+  PYTHONPATH: "$CI_PROJECT_DIR"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+before_script:
+  - python --version
+  - pip install -r requirements.txt
+
+lint:
+  stage: lint
+  script:
+    - pip install pylint
+    - pylint my_module/  # 👈 nhớ đổi "my_module/" thành thư mục module Odoo thật sự
+  only:
+    - dev
+    - merge_requests
+
+unit_test:
+  stage: test
+  script:
+    - pip install pytest
+    - pytest tests/
+  only:
+    - dev
+    - merge_requests
+
+deploy_to_dev:
+  stage: deploy
+  script:
+    - echo "Triển khai tới môi trường DEV tại server Odoo"
+    # ví dụ:
+    # - ssh user@server 'cd /srv/odoo && git pull && docker restart odoo-dev'
+  only:
+    - dev
