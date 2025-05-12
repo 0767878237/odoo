@@ -15,25 +15,26 @@ lint:
   stage: lint
   script:
     - pip install pylint
-    - pylint my_module/  # 👈 nhớ đổi "my_module/" thành thư mục module Odoo thật sự
-  only:
-    - dev
-    - merge_requests
+    - pylint my_module/  # 🔧 sửa thành thư mục module Odoo thật sự
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 unit_test:
   stage: test
   script:
     - pip install pytest
     - pytest tests/
-  only:
-    - dev
-    - merge_requests
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 deploy_to_dev:
   stage: deploy
   script:
     - echo "Triển khai tới môi trường DEV tại server Odoo"
-    # ví dụ:
-    # - ssh user@server 'cd /srv/odoo && git pull && docker restart odoo-dev'
-  only:
-    - dev
+    # ví dụ: ssh hoặc rsync
+    # - ssh user@your-server "cd /opt/odoo && git pull && systemctl restart odoo"
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "dev"'
+      when: always
