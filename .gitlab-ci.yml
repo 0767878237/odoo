@@ -7,15 +7,24 @@ variables:
   PYTHONPATH: "$CI_PROJECT_DIR"
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
+# Sử dụng image Python 3.13
+image: python:3.13
+
+# Cache pip để tăng tốc cài đặt
+cache:
+  paths:
+    - .cache/pip
+
 before_script:
   - python --version
+  - pip install --upgrade pip
   - pip install -r requirements.txt
 
 lint:
   stage: lint
   script:
-    - pip install pylint
-    - pylint my_module/  # 🔧 sửa thành thư mục module Odoo thật sự
+    # Kiểm tra xem thư mục my_module/ có file Python hay không
+    - if [ -n "$(find my_module/ -maxdepth 1 -name '*.py')" ]; then pylint my_module/; else echo "Thư mục my_module trống, bỏ qua lint"; fi
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -23,8 +32,8 @@ lint:
 unit_test:
   stage: test
   script:
-    - pip install pytest
-    - pytest tests/
+    # Kiểm tra xem thư mục tests/ có file test hay không
+    - if [ -n "$(find tests/ -maxdepth 1 -name 'test_*.py')" ]; then pytest tests/; else echo "Thư mục tests trống, bỏ qua unit test"; fi
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
@@ -33,7 +42,7 @@ deploy_to_dev:
   stage: deploy
   script:
     - echo "Triển khai tới môi trường DEV tại server Odoo"
-    # ví dụ: ssh hoặc rsync
+    # Ví dụ: ssh hoặc rsync
     # - ssh user@your-server "cd /opt/odoo && git pull && systemctl restart odoo"
   rules:
     - if: '$CI_COMMIT_BRANCH == "dev"'
