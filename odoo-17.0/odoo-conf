@@ -1,8 +1,0 @@
-[options]
-addons_path = addons,custom_addons
-admin_passwd = $pbkdf2-sha512$600000$5vzfW8s5hzCG0Nqbk1IK4Q$BByAZj6QDZhh/mmqmodFrhfsriYWm4Dty3cIgj3UDFNIDC6NRjblkOLXk.tRZPx18I6u05hJKwkBhIXNiqHnlw
-db_host = localhost
-db_port = 5432
-db_user = odoo17
-db_password = odoo123
-
